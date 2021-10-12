@@ -1,12 +1,3 @@
-# LocalLog
-
-### install 
-```
-go get "github.com/daqnext/LocalLog/log"
-```
-
-```go
-
 package main
 
 import (
@@ -52,7 +43,3 @@ func main() {
 	log.PrintLastN_ErrLogs(100)
 
 }
-
-
-
-```
