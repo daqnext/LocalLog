@@ -1,0 +1,11 @@
+2021-10-13 02:05:04 [ERRO] [f1:1] [f2:2] Total Error Fileds : %d2
+2021-10-13 02:05:04 [WARN] [f1:1] [f2:2] Total Warn Fileds : %d2
+2021-10-13 02:05:04 [INFO] [f1:1] [f2:2] Total Fileds : %d2
+2021-10-13 02:05:04 [DEBU] [f1:1] [f2:2] Total Debug Fileds : %d2
+2021-10-13 02:05:04 [WARN] this is warn ln
+2021-10-13 02:05:41 [ERRO] [f1:1] [f2:2] Total Error Fileds : %d2
+2021-10-13 02:05:41 [WARN] [f1:1] [f2:2] Total Warn Fileds : %d2
+2021-10-13 02:05:41 [INFO] [f1:1] [f2:2] Total Fileds : %d2
+2021-10-13 02:05:41 [DEBU] [f1:1] [f2:2] Total Debug Fileds : %d2
+2021-10-13 02:05:41 [WARN] this is warn ln
+2021-10-13 02:05:41 [WARN] this is warnf 123
