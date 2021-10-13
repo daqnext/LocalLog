@@ -6,8 +6,7 @@ go get "github.com/daqnext/LocalLog/log"
 ```
 
 ```go
-
-package main
+ package main
 
 import (
 	"fmt"
@@ -50,9 +49,12 @@ func main() {
 	fmt.Println("////////////////////////////////////////////////////////////////////////////////")
 	//err logs include all types :,error,panic ,fatal
 	log.PrintLastN_ErrLogs(100)
+	fmt.Println("////////////////////////////////////////////////////////////////////////////////")
+
+	log.Warnln("this is warn ln")
+	log.Warnf("this is warnf %d", 123)
 
 }
-
 
 
 ```
