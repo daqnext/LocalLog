@@ -145,7 +145,7 @@ func New(logsAbsFolder_ string, fileMaxSizeMBytes int, MaxBackupsFiles int, MaxA
 	logger.AddHook(rotateFileHook_ALL)
 	logger.AddHook(rotateFileHook_ERR)
 
-	return &LocalLog{*logger, alllogfile, errlogfile}, nil
+	return &LocalLog{*logger, logsAllAbsFolder, logsErrorAbsFolder}, nil
 
 }
 
