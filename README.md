@@ -6,10 +6,13 @@ go get "github.com/daqnext/LocalLog/log"
 ```
 
 ```go
+
+
 package main
 
 import (
 	"fmt"
+
 	"github.com/daqnext/LocalLog/log"
 )
 
@@ -17,7 +20,8 @@ import (
 
 func main() {
 
-	llog, err := log.New("logs", 2, 20, 30, log.LEVEL_DEBUG)
+	//default is info level
+	llog, err := log.New("logs", 2, 20, 30)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -25,17 +29,26 @@ func main() {
 	llog.WithFields(log.Fields{
 		"f1": "1",
 		"f2": "2",
-	}).Error("Total Error Fileds : %d", 2)
+	}).Error("Total xxx Error Fileds : %d", 2)
 
 	llog.WithFields(log.Fields{
 		"f1": "1",
 		"f2": "2",
-	}).Warn("Total Warn Fileds : %d", 2)
+	}).Warn("Total  yy Warn Fileds : %d", 2)
+
+	llog.ResetLevel(log.LEVEL_DEBUG)
 
 	llog.WithFields(log.Fields{
 		"f1": "1",
 		"f2": "2",
-	}).Info("Total Fileds : %d", 2)
+	}).Info("Total zzz Fileds : %d", 2)
+
+	llog.WithFields(log.Fields{
+		"f1": "1",
+		"f2": "2",
+	}).Debug("Total Debug Fileds : %d", 2)
+
+	llog.ResetLevel(log.LEVEL_FATAL)
 
 	llog.WithFields(log.Fields{
 		"f1": "1",
@@ -54,5 +67,6 @@ func main() {
 	llog.Warnf("this is warnf %d", 123)
 
 }
+
 
 ```
