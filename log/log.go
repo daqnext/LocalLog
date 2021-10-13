@@ -81,7 +81,7 @@ func New(logsAbsFolder_ string, fileMaxSizeMBytes int, MaxBackupsFiles int, MaxA
 
 	logger := logrus.New()
 
-	logsAbsFolder = strings.Trim(logsAbsFolder_, "/")
+	logsAbsFolder = strings.TrimRight(logsAbsFolder_, "/")
 	logsAllAbsFolder = logsAbsFolder + "/all"
 	logsErrorAbsFolder = logsAbsFolder + "/error"
 
