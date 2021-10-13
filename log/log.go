@@ -58,9 +58,13 @@ type LocalLog struct {
 	logrus.Logger
 	ALL_LogfolderABS string
 	ERR_LogfolderABS string
+	MaxSize          int
+	MaxBackups       int
+	MaxAge           int
+	Level            logrus.Level
 }
 
-func New(logsAbsFolder_ string, fileMaxSizeMBytes int, MaxBackupsFiles int, MaxAgeDays int, loglevel string) (*LocalLog, error) {
+func (logger *LocalLog) ResetLevel(loglevel string) error {
 
 	var LLevel logrus.Level
 
@@ -78,6 +82,62 @@ func New(logsAbsFolder_ string, fileMaxSizeMBytes int, MaxBackupsFiles int, MaxA
 	default:
 		LLevel = logrus.DebugLevel
 	}
+
+	alllogfile := logger.ALL_LogfolderABS + "/all_log"
+	errlogfile := logger.ERR_LogfolderABS + "/err_log"
+
+	rotateFileHook_ALL, err_all := NewRotateFileHook(RotateFileConfig{
+		Filename:   alllogfile,
+		MaxSize:    logger.MaxSize, // megabytes
+		MaxBackups: logger.MaxBackups,
+		MaxAge:     logger.MaxAge, //days
+		Level:      LLevel,
+		Formatter: UTCFormatter{&nested.Formatter{
+			NoColors:        true,
+			HideKeys:        false,
+			TimestampFormat: "2006-01-02 15:04:05",
+		}},
+	})
+	if err_all != nil {
+		return err_all
+	}
+
+	rotateFileHook_ERR, err_err := NewRotateFileHook(RotateFileConfig{
+		Filename:   errlogfile,
+		MaxSize:    logger.MaxSize, // megabytes
+		MaxBackups: logger.MaxBackups,
+		MaxAge:     logger.MaxAge, //days
+		Level:      logrus.ErrorLevel,
+		Formatter: UTCFormatter{&nested.Formatter{
+			NoColors:        true,
+			HideKeys:        false,
+			TimestampFormat: "2006-01-02 15:04:05",
+		}},
+	})
+
+	if err_err != nil {
+		return err_err
+	}
+
+	logger.SetFormatter(UTCFormatter{&nested.Formatter{
+		HideKeys:        false,
+		TimestampFormat: "2006-01-02 15:04:05",
+	}})
+
+	/////set hooks
+
+	//levelHooks[LLevel] = append(levelHooks[LLevel], rotateFileHook_ALL)
+	//levelHooks[logrus.ErrorLevel] = append(levelHooks[logrus.ErrorLevel], rotateFileHook_ERR)
+	logger.SetLevel(LLevel)
+	logger.ReplaceHooks(make(logrus.LevelHooks))
+	logger.AddHook(rotateFileHook_ALL)
+	logger.AddHook(rotateFileHook_ERR)
+
+	return nil
+}
+
+// Default is info level
+func New(logsAbsFolder_ string, fileMaxSizeMBytes int, MaxBackupsFiles int, MaxAgeDays int) (*LocalLog, error) {
 
 	logger := logrus.New()
 
@@ -99,54 +159,11 @@ func New(logsAbsFolder_ string, fileMaxSizeMBytes int, MaxBackupsFiles int, MaxA
 		return nil, dirError
 	}
 	///////////////////////
-
-	alllogfile := logsAllAbsFolder + "/all_log"
-	errlogfile := logsErrorAbsFolder + "/err_log"
-
-	rotateFileHook_ALL, err_all := NewRotateFileHook(RotateFileConfig{
-		Filename:   alllogfile,
-		MaxSize:    fileMaxSizeMBytes, // megabytes
-		MaxBackups: MaxBackupsFiles,
-		MaxAge:     MaxAgeDays, //days
-		Level:      LLevel,
-		Formatter: UTCFormatter{&nested.Formatter{
-			NoColors:        true,
-			HideKeys:        false,
-			TimestampFormat: "2006-01-02 15:04:05",
-		}},
-	})
-	if err_all != nil {
-		return nil, err_all
-	}
-
-	rotateFileHook_ERR, err_err := NewRotateFileHook(RotateFileConfig{
-		Filename:   errlogfile,
-		MaxSize:    fileMaxSizeMBytes, // megabytes
-		MaxBackups: MaxBackupsFiles,
-		MaxAge:     MaxAgeDays, //days
-		Level:      logrus.ErrorLevel,
-		Formatter: UTCFormatter{&nested.Formatter{
-			NoColors:        true,
-			HideKeys:        false,
-			TimestampFormat: "2006-01-02 15:04:05",
-		}},
-	})
-
-	if err_err != nil {
-		return nil, err_err
-	}
-
-	logger.SetFormatter(UTCFormatter{&nested.Formatter{
-		HideKeys:        false,
-		TimestampFormat: "2006-01-02 15:04:05",
-	}})
-
-	logger.SetLevel(LLevel)
-	logger.AddHook(rotateFileHook_ALL)
-	logger.AddHook(rotateFileHook_ERR)
-
-	return &LocalLog{*logger, logsAllAbsFolder, logsErrorAbsFolder}, nil
-
+	//default info level//
+	LocalLogPointer := &LocalLog{*logger, logsAllAbsFolder, logsErrorAbsFolder,
+		fileMaxSizeMBytes, MaxBackupsFiles, MaxAgeDays, logrus.InfoLevel}
+	LocalLogPointer.ResetLevel(LEVEL_INFO)
+	return LocalLogPointer, nil
 }
 
 func (logger *LocalLog) GetLogFilesList(log_folder string) ([]string, error) {
