@@ -2,6 +2,7 @@ package log
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -13,21 +14,21 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const LEVEL_PANIC_STR = "PANI"
-const LEVEL_FATAL_STR = "FATA"
-const LEVEL_ERROR_STR = "ERRO"
-const LEVEL_WARN_STR = "WARN"
-const LEVEL_INFO_STR = "INFO"
-const LEVEL_DEBUG_STR = "DEBU"
-const LEVEL_TRACE_STR = "TRAC"
+const LEVEL_PANIC = "PANI"
+const LEVEL_FATAL = "FATA"
+const LEVEL_ERROR = "ERRO"
+const LEVEL_WARN = "WARN"
+const LEVEL_INFO = "INFO"
+const LEVEL_DEBUG = "DEBU"
+const LEVEL_TRACE = "TRAC"
 
-const LEVEL_PANIC = logrus.PanicLevel
-const LEVEL_FATAL = logrus.FatalLevel
-const LEVEL_ERROR = logrus.ErrorLevel
-const LEVEL_WARN = logrus.WarnLevel
-const LEVEL_INFO = logrus.InfoLevel
-const LEVEL_DEBUG = logrus.DebugLevel
-const LEVEL_TRACE = logrus.TraceLevel //like sql trace
+const LLEVEL_PANIC = logrus.PanicLevel
+const LLEVEL_FATAL = logrus.FatalLevel
+const LLEVEL_ERROR = logrus.ErrorLevel
+const LLEVEL_WARN = logrus.WarnLevel
+const LLEVEL_INFO = logrus.InfoLevel
+const LLEVEL_DEBUG = logrus.DebugLevel
+const LLEVEL_TRACE = logrus.TraceLevel //like sql trace
 
 var logsAbsFolder string
 var logsAllAbsFolder string
@@ -74,7 +75,28 @@ type LocalLog struct {
 	MaxAge           int
 }
 
-func (logger *LocalLog) ResetLevel(loglevel logrus.Level) error {
+func (logger *LocalLog) ResetLevel(loglevel string) error {
+
+	var LLevel logrus.Level
+
+	switch loglevel {
+	case LEVEL_PANIC:
+		LLevel = logrus.PanicLevel
+	case LEVEL_FATAL:
+		LLevel = logrus.FatalLevel
+	case LEVEL_ERROR:
+		LLevel = logrus.ErrorLevel
+	case LEVEL_WARN:
+		LLevel = logrus.WarnLevel
+	case LEVEL_INFO:
+		LLevel = logrus.InfoLevel
+	case LEVEL_DEBUG:
+		LLevel = logrus.DebugLevel
+	case LEVEL_TRACE:
+		LLevel = logrus.TraceLevel
+	default:
+		return errors.New("no such level:" + loglevel)
+	}
 
 	alllogfile := logger.ALL_LogfolderABS + "/all_log"
 	errlogfile := logger.ERR_LogfolderABS + "/err_log"
@@ -84,7 +106,7 @@ func (logger *LocalLog) ResetLevel(loglevel logrus.Level) error {
 		MaxSize:    logger.MaxSize, // megabytes
 		MaxBackups: logger.MaxBackups,
 		MaxAge:     logger.MaxAge, //days
-		Level:      loglevel,
+		Level:      LLevel,
 		Formatter: UTCFormatter{&nested.Formatter{
 			NoColors:        true,
 			HideKeys:        false,
@@ -118,10 +140,7 @@ func (logger *LocalLog) ResetLevel(loglevel logrus.Level) error {
 	}})
 
 	/////set hooks
-
-	//levelHooks[LLevel] = append(levelHooks[LLevel], rotateFileHook_ALL)
-	//levelHooks[logrus.ErrorLevel] = append(levelHooks[logrus.ErrorLevel], rotateFileHook_ERR)
-	logger.SetLevel(loglevel)
+	logger.SetLevel(LLevel)
 	logger.ReplaceHooks(make(logrus.LevelHooks))
 	logger.AddHook(rotateFileHook_ALL)
 	logger.AddHook(rotateFileHook_ERR)
@@ -217,17 +236,17 @@ func (logger *LocalLog) printLastNLogs(type_ string, lastN int) {
 		lines := splitLines(string(stdout))
 		for i := 0; i < len(lines); i++ {
 
-			if strings.Contains(lines[i], "["+LEVEL_DEBUG_STR+"]") {
+			if strings.Contains(lines[i], "["+LEVEL_DEBUG+"]") {
 				fmt.Println(string(White), lines[i])
-			} else if strings.Contains(lines[i], "["+LEVEL_TRACE_STR+"]") {
+			} else if strings.Contains(lines[i], "["+LEVEL_TRACE+"]") {
 				fmt.Println(string(Cyan), lines[i])
-			} else if strings.Contains(lines[i], "["+LEVEL_INFO_STR+"]") {
+			} else if strings.Contains(lines[i], "["+LEVEL_INFO+"]") {
 				fmt.Println(string(Green), lines[i])
-			} else if strings.Contains(lines[i], "["+LEVEL_WARN_STR+"]") {
+			} else if strings.Contains(lines[i], "["+LEVEL_WARN+"]") {
 				fmt.Println(string(Yellow), lines[i])
-			} else if strings.Contains(lines[i], "["+LEVEL_FATAL_STR+"]") ||
-				strings.Contains(lines[i], "["+LEVEL_ERROR_STR+"]") ||
-				strings.Contains(lines[i], "["+LEVEL_PANIC_STR+"]") {
+			} else if strings.Contains(lines[i], "["+LEVEL_FATAL+"]") ||
+				strings.Contains(lines[i], "["+LEVEL_ERROR+"]") ||
+				strings.Contains(lines[i], "["+LEVEL_PANIC+"]") {
 				fmt.Println(string(Red), lines[i])
 			} else {
 				fmt.Println(string(White), lines[i])
