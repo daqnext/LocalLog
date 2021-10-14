@@ -63,7 +63,8 @@ type LocalLog struct {
 	MaxSize          int
 	MaxBackups       int
 	MaxAge           int
-	Level            logrus.Level
+	LogrusLevel      logrus.Level
+	LogLevel         string
 }
 
 func (logger *LocalLog) ResetLevel(loglevel string) error {
@@ -163,7 +164,7 @@ func New(logsAbsFolder_ string, fileMaxSizeMBytes int, MaxBackupsFiles int, MaxA
 	///////////////////////
 	//default info level//
 	LocalLogPointer := &LocalLog{*logger, logsAllAbsFolder, logsErrorAbsFolder,
-		fileMaxSizeMBytes, MaxBackupsFiles, MaxAgeDays, logrus.InfoLevel}
+		fileMaxSizeMBytes, MaxBackupsFiles, MaxAgeDays, logrus.InfoLevel, LEVEL_INFO}
 	LocalLogPointer.ResetLevel(LEVEL_INFO)
 	return LocalLogPointer, nil
 }
