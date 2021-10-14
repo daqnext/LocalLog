@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"runtime"
 	"strconv"
 	"strings"
 
@@ -37,6 +38,16 @@ var logsErrorAbsFolder string
 type Fields = logrus.Fields
 
 var ErrorKey = logrus.ErrorKey
+
+var ShowColor bool
+
+func init() {
+	if runtime.GOOS == "windows" {
+		ShowColor = false
+	} else {
+		ShowColor = true
+	}
+}
 
 func checkAndMkDir(logsAbsFolder string) error {
 
@@ -137,6 +148,7 @@ func (logger *LocalLog) ResetLevel(loglevel string) error {
 	logger.SetFormatter(UTCFormatter{&nested.Formatter{
 		HideKeys:        false,
 		TimestampFormat: "2006-01-02 15:04:05",
+		NoColors:        !ShowColor,
 	}})
 
 	/////set hooks
@@ -229,39 +241,38 @@ func (logger *LocalLog) printLastNLogs(type_ string, lastN int) {
 		cmd := exec.Command("tail", "-n", strconv.Itoa(lastN), fname)
 		stdout, err := cmd.Output()
 		if err != nil {
-			fmt.Println(string(Red), err.Error())
-			fmt.Println(string(White), "exit")
+			PrintlnColor(Red, err.Error())
+			PrintlnColor(White, "exit")
 			return
 		}
 		lines := splitLines(string(stdout))
 		for i := 0; i < len(lines); i++ {
 
 			if strings.Contains(lines[i], "["+LEVEL_DEBUG+"]") {
-				fmt.Println(string(White), lines[i])
+				PrintlnColor(White, lines[i])
 			} else if strings.Contains(lines[i], "["+LEVEL_TRACE+"]") {
-				fmt.Println(string(Cyan), lines[i])
+				PrintlnColor(Cyan, lines[i])
 			} else if strings.Contains(lines[i], "["+LEVEL_INFO+"]") {
-				fmt.Println(string(Green), lines[i])
+				PrintlnColor(Green, lines[i])
 			} else if strings.Contains(lines[i], "["+LEVEL_WARN+"]") {
-				fmt.Println(string(Yellow), lines[i])
+				PrintlnColor(Yellow, lines[i])
 			} else if strings.Contains(lines[i], "["+LEVEL_FATAL+"]") ||
 				strings.Contains(lines[i], "["+LEVEL_ERROR+"]") ||
 				strings.Contains(lines[i], "["+LEVEL_PANIC+"]") {
-				fmt.Println(string(Red), lines[i])
+				PrintlnColor(Red, lines[i])
 			} else {
-				fmt.Println(string(White), lines[i])
+				PrintlnColor(White, lines[i])
 			}
 
 			Counter++
 			if Counter >= lastN {
-				fmt.Println(string(White), "END")
+				PrintlnColor(White, "END")
 				return
 			}
 		}
 
 	}
-
-	fmt.Println(string(White), "EXIT")
+	PrintlnColor(White, "EXIT")
 }
 
 func splitLines(s string) []string {
