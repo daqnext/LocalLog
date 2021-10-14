@@ -38,7 +38,7 @@ func main() {
 		"f2": "2",
 	}).Debug("Total Debug Fileds : %d", 2)
 
-	llog.ResetLevel(log.LEVEL_FATAL)
+	llog.ResetLevel(log.LEVEL_TRACE)
 
 	llog.WithFields(log.Fields{
 		"f1": "1",
@@ -55,5 +55,7 @@ func main() {
 
 	llog.Warnln("this is warn ln")
 	llog.Warnf("this is warnf %d", 123)
+
+	llog.Traceln("this is warn ln")
 
 }

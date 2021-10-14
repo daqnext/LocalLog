@@ -13,12 +13,21 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const LEVEL_PANIC = "PANI"
-const LEVEL_FATAL = "FATA"
-const LEVEL_ERROR = "ERRO"
-const LEVEL_WARN = "WARN"
-const LEVEL_INFO = "INFO"
-const LEVEL_DEBUG = "DEBU"
+const LEVEL_PANIC_STR = "PANI"
+const LEVEL_FATAL_STR = "FATA"
+const LEVEL_ERROR_STR = "ERRO"
+const LEVEL_WARN_STR = "WARN"
+const LEVEL_INFO_STR = "INFO"
+const LEVEL_DEBUG_STR = "DEBU"
+const LEVEL_TRACE_STR = "TRAC"
+
+const LEVEL_PANIC = logrus.PanicLevel
+const LEVEL_FATAL = logrus.FatalLevel
+const LEVEL_ERROR = logrus.ErrorLevel
+const LEVEL_WARN = logrus.WarnLevel
+const LEVEL_INFO = logrus.InfoLevel
+const LEVEL_DEBUG = logrus.DebugLevel
+const LEVEL_TRACE = logrus.TraceLevel //like sql trace
 
 var logsAbsFolder string
 var logsAllAbsFolder string
@@ -64,27 +73,9 @@ type LocalLog struct {
 	MaxBackups       int
 	MaxAge           int
 	LogrusLevel      logrus.Level
-	LogLevel         string
 }
 
-func (logger *LocalLog) ResetLevel(loglevel string) error {
-
-	var LLevel logrus.Level
-
-	switch loglevel {
-	case LEVEL_PANIC:
-		LLevel = logrus.PanicLevel
-	case LEVEL_FATAL:
-		LLevel = logrus.FatalLevel
-	case LEVEL_ERROR:
-		LLevel = logrus.ErrorLevel
-	case LEVEL_WARN:
-		LLevel = logrus.WarnLevel
-	case LEVEL_INFO:
-		LLevel = logrus.InfoLevel
-	default:
-		LLevel = logrus.DebugLevel
-	}
+func (logger *LocalLog) ResetLevel(loglevel logrus.Level) error {
 
 	alllogfile := logger.ALL_LogfolderABS + "/all_log"
 	errlogfile := logger.ERR_LogfolderABS + "/err_log"
@@ -94,7 +85,7 @@ func (logger *LocalLog) ResetLevel(loglevel string) error {
 		MaxSize:    logger.MaxSize, // megabytes
 		MaxBackups: logger.MaxBackups,
 		MaxAge:     logger.MaxAge, //days
-		Level:      LLevel,
+		Level:      loglevel,
 		Formatter: UTCFormatter{&nested.Formatter{
 			NoColors:        true,
 			HideKeys:        false,
@@ -131,7 +122,7 @@ func (logger *LocalLog) ResetLevel(loglevel string) error {
 
 	//levelHooks[LLevel] = append(levelHooks[LLevel], rotateFileHook_ALL)
 	//levelHooks[logrus.ErrorLevel] = append(levelHooks[logrus.ErrorLevel], rotateFileHook_ERR)
-	logger.SetLevel(LLevel)
+	logger.SetLevel(loglevel)
 	logger.ReplaceHooks(make(logrus.LevelHooks))
 	logger.AddHook(rotateFileHook_ALL)
 	logger.AddHook(rotateFileHook_ERR)
@@ -164,7 +155,7 @@ func New(logsAbsFolder_ string, fileMaxSizeMBytes int, MaxBackupsFiles int, MaxA
 	///////////////////////
 	//default info level//
 	LocalLogPointer := &LocalLog{*logger, logsAllAbsFolder, logsErrorAbsFolder,
-		fileMaxSizeMBytes, MaxBackupsFiles, MaxAgeDays, logrus.InfoLevel, LEVEL_INFO}
+		fileMaxSizeMBytes, MaxBackupsFiles, MaxAgeDays, logrus.InfoLevel}
 	LocalLogPointer.ResetLevel(LEVEL_INFO)
 	return LocalLogPointer, nil
 }
@@ -227,15 +218,17 @@ func (logger *LocalLog) printLastNLogs(type_ string, lastN int) {
 		lines := splitLines(string(stdout))
 		for i := 0; i < len(lines); i++ {
 
-			if strings.Contains(lines[i], "["+LEVEL_DEBUG+"]") {
+			if strings.Contains(lines[i], "["+LEVEL_DEBUG_STR+"]") {
 				fmt.Println(string(White), lines[i])
-			} else if strings.Contains(lines[i], "["+LEVEL_INFO+"]") {
+			} else if strings.Contains(lines[i], "["+LEVEL_TRACE_STR+"]") {
+				fmt.Println(string(Cyan), lines[i])
+			} else if strings.Contains(lines[i], "["+LEVEL_INFO_STR+"]") {
 				fmt.Println(string(Green), lines[i])
-			} else if strings.Contains(lines[i], "["+LEVEL_WARN+"]") {
+			} else if strings.Contains(lines[i], "["+LEVEL_WARN_STR+"]") {
 				fmt.Println(string(Yellow), lines[i])
-			} else if strings.Contains(lines[i], "["+LEVEL_FATAL+"]") ||
-				strings.Contains(lines[i], "["+LEVEL_ERROR+"]") ||
-				strings.Contains(lines[i], "["+LEVEL_PANIC+"]") {
+			} else if strings.Contains(lines[i], "["+LEVEL_FATAL_STR+"]") ||
+				strings.Contains(lines[i], "["+LEVEL_ERROR_STR+"]") ||
+				strings.Contains(lines[i], "["+LEVEL_PANIC_STR+"]") {
 				fmt.Println(string(Red), lines[i])
 			} else {
 				fmt.Println(string(White), lines[i])
