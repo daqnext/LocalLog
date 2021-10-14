@@ -26,6 +26,8 @@ var logsErrorAbsFolder string
 
 type Fields = logrus.Fields
 
+var ErrorKey = logrus.ErrorKey
+
 func checkAndMkDir(logsAbsFolder string) error {
 
 	info, err := os.Stat(logsAbsFolder)
