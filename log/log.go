@@ -3,7 +3,6 @@ package log
 import (
 	"bufio"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -225,12 +224,12 @@ func (logger *LocalLog) printLastNLogs(type_ string, lastN int) {
 	alllogfiles, err = logger.GetLogFilesList(folder)
 
 	if err != nil {
-		fmt.Println(string(Red), err.Error())
-		fmt.Println(string(White), "exit")
+		PrintlnColor(Red, err.Error())
+		PrintlnColor(White, "exit")
 		return
 	}
 	if len(alllogfiles) == 0 {
-		fmt.Println("no logfile")
+		PrintlnColor(White, "no logfile")
 		return
 	}
 
@@ -238,7 +237,15 @@ func (logger *LocalLog) printLastNLogs(type_ string, lastN int) {
 
 	for i := 0; i < len(alllogfiles); i++ {
 		fname := folder + "/" + alllogfiles[i]
-		cmd := exec.Command("tail", "-n", strconv.Itoa(lastN), fname)
+
+		var cmd *exec.Cmd
+
+		if runtime.GOOS == "windows" {
+			cmd = exec.Command("powershell", "-command", ` "& {Get-Content `+fname+`  | Select-Object -last `+strconv.Itoa(lastN)+` }"`)
+		} else {
+			cmd = exec.Command("tail", "-n", strconv.Itoa(lastN), fname)
+		}
+
 		stdout, err := cmd.Output()
 		if err != nil {
 			PrintlnColor(Red, err.Error())
