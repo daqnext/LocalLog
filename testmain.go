@@ -36,7 +36,7 @@ func main() {
 	configAbsPath()
 
 	//default is info level
-	llog, err := log.New(GetPath("logs"), 2, 20, 30)
+	llog, err := log.New(GetPath(path.Dir("logs")), 2, 20, 30)
 	if err != nil {
 		panic(err.Error())
 	}
