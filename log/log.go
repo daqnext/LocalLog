@@ -3,6 +3,7 @@ package log
 import (
 	"bufio"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -243,6 +244,26 @@ func (logger *LocalLog) printLastNLogs(type_ string, lastN int) {
 
 		if runtime.GOOS == "windows" {
 			cmd = exec.Command("powershell", "-command"+` " & {Get-Content `+fname+` | Select-Object -last `+strconv.Itoa(lastN)+` } " `)
+
+			cmd := exec.Command("powershell", "-nologo", "-noprofile")
+			stdin, err := cmd.StdinPipe()
+			if err != nil {
+				PrintlnColor(Red, err.Error())
+				PrintlnColor(Red, "log view not supported , please directly check logfile :"+fname)
+				PrintlnColor(White, "exit")
+				return
+			}
+			go func() {
+				defer stdin.Close()
+				fmt.Fprintln(stdin, "Get-Content "+fname+" | Select-Object -last "+strconv.Itoa(lastN))
+			}()
+			// out, err := cmd.CombinedOutput()
+			// if err != nil {
+			// 	PrintlnColor(Red, err.Error())
+			// 	PrintlnColor(Red, "log view not supported , please directly check logfile :"+fname)
+			// 	PrintlnColor(White, "exit")
+			// 	return
+			// }
 		} else {
 			cmd = exec.Command("tail", "-n", strconv.Itoa(lastN), fname)
 		}
