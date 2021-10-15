@@ -34,9 +34,6 @@ func configAbsPath() {
 
 func main() {
 	configAbsPath()
-	fmt.Println(GetPath("/logs/"))
-
-	return
 
 	//default is info level
 	llog, err := log.New(GetPath("logs"), 2, 20, 30)
