@@ -13,7 +13,7 @@ import (
 	"strings"
 
 	nested "github.com/antonfisher/nested-logrus-formatter"
-	"github.com/daqnext/utils/color"
+	"github.com/daqnext/utils/color_util"
 	"github.com/sirupsen/logrus"
 )
 
@@ -227,12 +227,12 @@ func (logger *LocalLog) printLastNLogs(type_ string, lastN int) {
 	alllogfiles, err = logger.GetLogFilesList(folder)
 
 	if err != nil {
-		color.ColorPrintln(color.Red, err.Error())
-		color.ColorPrintln(color.White, "exit")
+		color_util.ColorPrintln(color_util.Red, err.Error())
+		color_util.ColorPrintln(color_util.White, "exit")
 		return
 	}
 	if len(alllogfiles) == 0 {
-		color.ColorPrintln(color.White, "no logfile")
+		color_util.ColorPrintln(color_util.White, "no logfile")
 		return
 	}
 
@@ -247,9 +247,9 @@ func (logger *LocalLog) printLastNLogs(type_ string, lastN int) {
 			cmd = exec.Command("powershell", "-nologo", "-noprofile")
 			stdin, err := cmd.StdinPipe()
 			if err != nil {
-				color.ColorPrintln(color.Red, err.Error())
-				color.ColorPrintln(color.Red, "log view not supported , please directly check logfile :"+fname)
-				color.ColorPrintln(color.White, "exit")
+				color_util.ColorPrintln(color_util.Red, err.Error())
+				color_util.ColorPrintln(color_util.Red, "log view not supported , please directly check logfile :"+fname)
+				color_util.ColorPrintln(color_util.White, "exit")
 				return
 			}
 			go func() {
@@ -262,38 +262,38 @@ func (logger *LocalLog) printLastNLogs(type_ string, lastN int) {
 
 		stdout, err := cmd.Output()
 		if err != nil {
-			color.ColorPrintln(color.Red, err.Error())
-			color.ColorPrintln(color.White, "exit")
+			color_util.ColorPrintln(color_util.Red, err.Error())
+			color_util.ColorPrintln(color_util.White, "exit")
 			return
 		}
 		lines := splitLines(string(stdout))
 		for i := 0; i < len(lines); i++ {
 
 			if strings.Contains(lines[i], "["+LEVEL_DEBUG+"]") {
-				color.ColorPrintln(color.White, lines[i])
+				color_util.ColorPrintln(color_util.White, lines[i])
 			} else if strings.Contains(lines[i], "["+LEVEL_TRACE+"]") {
-				color.ColorPrintln(color.Cyan, lines[i])
+				color_util.ColorPrintln(color_util.Cyan, lines[i])
 			} else if strings.Contains(lines[i], "["+LEVEL_INFO+"]") {
-				color.ColorPrintln(color.Green, lines[i])
+				color_util.ColorPrintln(color_util.Green, lines[i])
 			} else if strings.Contains(lines[i], "["+LEVEL_WARN+"]") {
-				color.ColorPrintln(color.Yellow, lines[i])
+				color_util.ColorPrintln(color_util.Yellow, lines[i])
 			} else if strings.Contains(lines[i], "["+LEVEL_FATAL+"]") ||
 				strings.Contains(lines[i], "["+LEVEL_ERROR+"]") ||
 				strings.Contains(lines[i], "["+LEVEL_PANIC+"]") {
-				color.ColorPrintln(color.Red, lines[i])
+				color_util.ColorPrintln(color_util.Red, lines[i])
 			} else {
-				color.ColorPrintln(color.White, lines[i])
+				color_util.ColorPrintln(color_util.White, lines[i])
 			}
 
 			Counter++
 			if Counter >= lastN {
-				color.ColorPrintln(color.White, "END")
+				color_util.ColorPrintln(color_util.White, "END")
 				return
 			}
 		}
 
 	}
-	color.ColorPrintln(color.White, "EXIT")
+	color_util.ColorPrintln(color_util.White, "EXIT")
 }
 
 func splitLines(s string) []string {

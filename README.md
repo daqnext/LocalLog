@@ -19,19 +19,20 @@ go build
 
 ```go
 
+
 package main
 
 import (
 	"fmt"
 
 	"github.com/daqnext/LocalLog/log"
-	"github.com/daqnext/utils/path"
+	"github.com/daqnext/utils/path_util"
 )
 
 func main() {
 
 	//default is info level
-	llog, err := log.New(path.GetAbsPath("logs"), 2, 20, 30)
+	llog, err := log.New(path_util.GetAbsPath("logs"), 2, 20, 30)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -74,6 +75,8 @@ func main() {
 	llog.Traceln("this is warn ln")
 
 }
+
+
 
 
 ```
