@@ -2,16 +2,39 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"strings"
 
 	"github.com/daqnext/LocalLog/log"
 )
 
 /////////////////////
 
+var ExEPath string
+
+func GetPath(relpath string) string {
+	return ExEPath + "/" + strings.Trim(relpath, "/")
+}
+
+func configAbsPath() {
+	file, err := exec.LookPath(os.Args[0])
+	if err != nil {
+		panic(err.Error())
+	}
+	runPath, err := filepath.Abs(file)
+	if err != nil {
+		panic(err.Error())
+	}
+	index := strings.LastIndex(runPath, string(os.PathSeparator))
+	ExEPath = runPath[:index]
+}
+
 func main() {
 
 	//default is info level
-	llog, err := log.New("logs", 2, 20, 30)
+	llog, err := log.New(GetPath("logs"), 2, 20, 30)
 	if err != nil {
 		panic(err.Error())
 	}
