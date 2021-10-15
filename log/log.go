@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"path"
+	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
@@ -109,8 +109,8 @@ func (logger *LocalLog) ResetLevel(loglevel string) error {
 		return errors.New("no such level:" + loglevel)
 	}
 
-	alllogfile := path.Join(logger.ALL_LogfolderABS, "all_log")
-	errlogfile := path.Join(logger.ERR_LogfolderABS, "err_log")
+	alllogfile := filepath.Join(logger.ALL_LogfolderABS, "all_log")
+	errlogfile := filepath.Join(logger.ERR_LogfolderABS, "err_log")
 
 	rotateFileHook_ALL, err_all := NewRotateFileHook(RotateFileConfig{
 		Filename:   alllogfile,
@@ -165,9 +165,9 @@ func New(logsAbsFolder_ string, fileMaxSizeMBytes int, MaxBackupsFiles int, MaxA
 
 	logger := logrus.New()
 
-	logsAbsFolder = path.Join(logsAbsFolder_, "")
-	logsAllAbsFolder = path.Join(logsAbsFolder, "all")
-	logsErrorAbsFolder = path.Join(logsAbsFolder, "error")
+	logsAbsFolder = filepath.Join(logsAbsFolder_, "")
+	logsAllAbsFolder = filepath.Join(logsAbsFolder, "all")
+	logsErrorAbsFolder = filepath.Join(logsAbsFolder, "error")
 
 	//make sure the logs folder exist otherwise create dir
 	dirError := checkAndMkDir(logsAbsFolder)
@@ -237,7 +237,7 @@ func (logger *LocalLog) printLastNLogs(type_ string, lastN int) {
 	Counter := 0
 
 	for i := 0; i < len(alllogfiles); i++ {
-		fname := path.Join(folder, alllogfiles[i])
+		fname := filepath.Join(folder, alllogfiles[i])
 
 		var cmd *exec.Cmd
 

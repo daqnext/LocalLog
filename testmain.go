@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -16,7 +15,7 @@ import (
 var ExEPath string
 
 func GetPath(relpath string) string {
-	return path.Join(ExEPath, relpath)
+	return filepath.Join(ExEPath, relpath)
 }
 
 func configAbsPath() {
@@ -36,7 +35,7 @@ func main() {
 	configAbsPath()
 
 	//default is info level
-	llog, err := log.New(GetPath(path.Dir("logs")), 2, 20, 30)
+	llog, err := log.New(GetPath("logs"), 2, 20, 30)
 	if err != nil {
 		panic(err.Error())
 	}
