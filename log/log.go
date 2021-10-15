@@ -110,8 +110,8 @@ func (logger *LocalLog) ResetLevel(loglevel string) error {
 		return errors.New("no such level:" + loglevel)
 	}
 
-	alllogfile := filepath.Join(logger.ALL_LogfolderABS, "all_log")
-	errlogfile := filepath.Join(logger.ERR_LogfolderABS, "err_log")
+	alllogfile := filepath.Join(logger.ALL_LogfolderABS, "all_log.txt")
+	errlogfile := filepath.Join(logger.ERR_LogfolderABS, "err_log.txt")
 
 	rotateFileHook_ALL, err_all := NewRotateFileHook(RotateFileConfig{
 		Filename:   alllogfile,

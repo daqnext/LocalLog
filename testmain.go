@@ -64,11 +64,6 @@ func main() {
 
 	llog.ResetLevel(log.LEVEL_TRACE)
 
-	llog.WithFields(log.Fields{
-		"f1": "1",
-		"f2": "2",
-	}).Debug("Total Debug Fileds : %d", 2)
-
 	fmt.Println("////////////////////////////////////////////////////////////////////////////////")
 	//all logs include all types :debug ,info ,warning ,error,panic ,fatal
 	llog.PrintLastN_AllLogs(100)
