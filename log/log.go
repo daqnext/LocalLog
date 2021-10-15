@@ -242,7 +242,7 @@ func (logger *LocalLog) printLastNLogs(type_ string, lastN int) {
 		var cmd *exec.Cmd
 
 		if runtime.GOOS == "windows" {
-			cmd = exec.Command("powershell -command " + ` "& {Get-Content ` + fname + `  | Select-Object -last ` + strconv.Itoa(lastN) + ` }"`)
+			cmd = exec.Command("powershell -command " + `"` + " & {Get-Content " + fname + "  | Select-Object -last " + strconv.Itoa(lastN) + " }" + ` "`)
 		} else {
 			cmd = exec.Command("tail", "-n", strconv.Itoa(lastN), fname)
 		}
